@@ -6,7 +6,7 @@ import (
 )
 
 func StreamAudio(w http.ResponseWriter, r *http.Request) {
-	file, err := os.Open("file.mp3")
+	file, err := os.Open("../music/file.mp3")
 	if err != nil {
 		http.Error(w, "Could not open audio file", http.StatusInternalServerError)
 		return
