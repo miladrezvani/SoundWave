@@ -8,6 +8,10 @@ import (
 	"gorm.io/gorm"
 )
 
+var (
+	GormDB *gorm.DB
+)
+
 func Init(dbPath string) (*gorm.DB, error) {
 	dir := filepath.Dir(dbPath)
 	if dir != "." {
@@ -16,11 +20,12 @@ func Init(dbPath string) (*gorm.DB, error) {
 		}
 	}
 
-	db, err := Connect(dbPath)
+	var err error
+	GormDB, err = Connect(dbPath)
 	if err != nil {
 		return nil, err
 	}
 
-	db.AutoMigrate(&models.MusicInfo{})
-	return db, nil
+	GormDB.AutoMigrate(&models.Song{}, &models.Album{}, &models.Artist{})
+	return GormDB, nil
 }
