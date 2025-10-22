@@ -3,6 +3,7 @@ package utils
 import (
 	_ "image/jpeg"
 	_ "image/png"
+	"strings"
 
 	"go.senan.xyz/taglib"
 )
@@ -35,7 +36,8 @@ func GetMusicTags(tags map[string][]string, imageBytes []byte) *musicData {
 		data.ReleaseDate = tags[taglib.Date][0][0:4]
 	}
 	if len(tags[taglib.TrackNumber]) > 0 {
-		data.TrackNumber = tags[taglib.TrackNumber][0]
+		tmp := tags[taglib.TrackNumber][0]
+		data.TrackNumber = tmp[:strings.IndexByte(tmp, '/')]
 	}
 	if imageBytes != nil {
 		data.AlbumArt = imageBytes
