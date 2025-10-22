@@ -1,17 +1,23 @@
 package utils
 
-import "go.senan.xyz/taglib"
+import (
+	_ "image/jpeg"
+	_ "image/png"
+
+	"go.senan.xyz/taglib"
+)
 
 type musicData struct {
 	Title       string
 	ArtistName  string
 	AlbumName   string
+	AlbumArt    []byte
 	Genre       string
 	ReleaseDate string
 	TrackNumber string
 }
 
-func GetMusicTags(tags map[string][]string) *musicData {
+func GetMusicTags(tags map[string][]string, imageBytes []byte) *musicData {
 	data := &musicData{}
 	if len(tags[taglib.Title]) > 0 {
 		data.Title = tags[taglib.Title][0]
@@ -25,11 +31,14 @@ func GetMusicTags(tags map[string][]string) *musicData {
 	if len(tags[taglib.Genre]) > 0 {
 		data.Genre = tags[taglib.Genre][0]
 	}
-	if len(tags[taglib.ReleaseDate]) > 0 {
-		data.ReleaseDate = tags[taglib.ReleaseDate][0]
+	if len(tags[taglib.Date]) > 0 {
+		data.ReleaseDate = tags[taglib.Date][0][0:4]
 	}
 	if len(tags[taglib.TrackNumber]) > 0 {
 		data.TrackNumber = tags[taglib.TrackNumber][0]
+	}
+	if imageBytes != nil {
+		data.AlbumArt = imageBytes
 	}
 	return data
 }

@@ -37,13 +37,19 @@ func ScanMusicHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Println("error reading file: ", path)
 			}
-			data := utils.GetMusicTags(tags)
+
+			imageBytes, err := taglib.ReadImage(path)
+			if err != nil {
+				log.Println("error reading Image: ", path)
+			}
+
+			data := utils.GetMusicTags(tags, imageBytes)
 			artist := models.Artist{Name: data.ArtistName}
 			if err := tx.Create(&artist).Error; err != nil {
 				tx.Rollback()
 				return err
 			}
-			album := models.Album{AlbumName: data.AlbumName, Genre: data.Genre, ReleaseDate: data.ReleaseDate, ArtistId: artist.ID}
+			album := models.Album{AlbumName: data.AlbumName, AlbumArt: data.AlbumArt, Genre: data.Genre, ReleaseDate: data.ReleaseDate, ArtistId: artist.ID}
 			if err := tx.Create(&album).Error; err != nil {
 				tx.Rollback()
 				return err
