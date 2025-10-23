@@ -3,8 +3,6 @@ package handlers
 import (
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"github.com/miladrezvani/SoundWave/models"
 	"github.com/miladrezvani/SoundWave/services"
@@ -17,12 +15,7 @@ import (
 func ScanMusicHandler(w http.ResponseWriter, r *http.Request) {
 	go func(db *gorm.DB) {
 
-		homeDir, err := os.UserHomeDir()
-		if err != nil {
-			log.Println("can not find user home directory")
-			return
-		}
-		homeDir = filepath.Join(homeDir, "/Music")
+		homeDir := utils.GetRoot()
 		services.ScanMusic(homeDir, "", func(path string, ext string) error {
 			tx := db.Begin()
 
