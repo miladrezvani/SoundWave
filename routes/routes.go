@@ -9,6 +9,7 @@ import (
 
 func RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/get/albums", handlers.GetAlbums)
+	mux.HandleFunc("/get/music/list", handlers.GetMusicList)
 	mux.HandleFunc("/stream", services.StreamAudio)
 	mux.HandleFunc("/scan/music", handlers.ScanMusicHandler)
 }
