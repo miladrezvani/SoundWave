@@ -38,19 +38,28 @@ func ScanMusicHandler(w http.ResponseWriter, r *http.Request) {
 
 			data := utils.GetMusicTags(tags, imageBytes)
 			artist := models.Artist{Name: data.ArtistName}
-			if err := tx.Create(&artist).Error; err != nil {
-				tx.Rollback()
-				return err
+			db.Where("name = ?", data.ArtistName).First(&artist)
+			if artist.ID == 0 {
+				if err := tx.Create(&artist).Error; err != nil {
+					tx.Rollback()
+					return err
+				}
 			}
 			album := models.Album{AlbumName: data.AlbumName, AlbumArt: data.AlbumArt, Genre: data.Genre, ReleaseDate: data.ReleaseDate, ArtistId: artist.ID}
-			if err := tx.Create(&album).Error; err != nil {
-				tx.Rollback()
-				return err
+			db.Where("album_name = ? AND genre = ? AND release_date = ?", data.AlbumName, data.Genre, data.ReleaseDate).First(&album)
+			if album.ID == 0 {
+				if err := tx.Create(&album).Error; err != nil {
+					tx.Rollback()
+					return err
+				}
 			}
 			song := models.Song{Title: data.Title, TrackNumber: data.TrackNumber, FilePath: path, Format: ext, AlbumId: album.ID}
-			if err := tx.Create(&song).Error; err != nil {
-				tx.Rollback()
-				return err
+			db.Where("title = ? AND track_number = ? AND file_path = ? AND format = ?", data.Title, data.TrackNumber, path, ext).First(&song)
+			if song.ID == 0 {
+				if err := tx.Create(&song).Error; err != nil {
+					tx.Rollback()
+					return err
+				}
 			}
 			return tx.Commit().Error
 		})
