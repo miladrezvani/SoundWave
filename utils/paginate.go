@@ -7,23 +7,24 @@ import (
 	"gorm.io/gorm"
 )
 
-func Paginate(r *http.Request) func(db *gorm.DB) *gorm.DB {
-	return func(db *gorm.DB) *gorm.DB {
-		q := r.URL.Query()
-		page, _ := strconv.Atoi(q.Get("page"))
-		if page <= 0 {
-			page = 1
-		}
+func Paginate(r *http.Request) (func(db *gorm.DB) *gorm.DB, int) {
+	q := r.URL.Query()
+	page, _ := strconv.Atoi(q.Get("page"))
+	if page <= 0 {
+		page = 1
+	}
 
-		limit, _ := strconv.Atoi(q.Get("limit"))
-		switch {
-		case limit > 100:
-			limit = 100
-		case limit <= 0:
-			limit = 10
-		}
+	limit, _ := strconv.Atoi(q.Get("limit"))
+	switch {
+	case limit > 100:
+		limit = 100
+	case limit <= 0:
+		limit = 10
+	}
 
-		offset := (page - 1) * limit
+	offset := (page - 1) * limit
+	scope := func(db *gorm.DB) *gorm.DB {
 		return db.Offset(offset).Limit(limit)
 	}
+	return scope, page
 }
