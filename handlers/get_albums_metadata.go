@@ -9,12 +9,12 @@ import (
 	"github.com/miladrezvani/SoundWave/utils"
 )
 
-type albumsPaginatedData struct {
+type albumsPaginatedDatajson struct {
 	NextPage int
-	MetaData []albumsMetaData
+	MetaData []albumsMetaDatajson
 }
 
-type albumsMetaData struct {
+type albumsMetaDatajson struct {
 	ID        uint
 	AlbumName string
 }
@@ -22,12 +22,12 @@ type albumsMetaData struct {
 func GetAlbumsMetaData(w http.ResponseWriter, r *http.Request) {
 	db := database.GormDB
 	var albums []models.Album
-	var albumData albumsPaginatedData
+	var albumData albumsPaginatedDatajson
 	scope, page := utils.Paginate(r)
 	db.Scopes(scope).Find(&albums)
 
 	for _, album := range albums {
-		data := albumsMetaData{
+		data := albumsMetaDatajson{
 			ID:        album.ID,
 			AlbumName: album.AlbumName,
 		}

@@ -11,10 +11,10 @@ import {
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { GetAlbums } from "@/api/GetAlbumsMetaData";
+import { GetAlbumsMetaData } from "@/api/GetAlbumsMetaData";
 import { useInView } from "react-intersection-observer";
 
-const Albums = () => {
+const Albums = ({ setAlbum }) => {
   const {
     data,
     error,
@@ -24,7 +24,7 @@ const Albums = () => {
     status,
   } = useInfiniteQuery({
     queryKey: ["ablums"],
-    queryFn: ({ pageParam = 1 }) => GetAlbums({ pageParam }),
+    queryFn: ({ pageParam = 1 }) => GetAlbumsMetaData({ pageParam }),
     getNextPageParam: (LastPage) => LastPage.NextPage,
   });
   const { ref, inView } = useInView({
@@ -32,7 +32,6 @@ const Albums = () => {
     triggerOnce: false,
   });
   useEffect(() => {
-    console.log("jasijcoasjocjaojcj   ", inView);
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
@@ -51,6 +50,7 @@ const Albums = () => {
                     variant="ghost"
                     className="flex flex-box flex-col h-40 w-40 justify-end items-center relative"
                     key={data.ID}
+                    onClick={() => setAlbum(data.ID)}
                   >
                     <img
                       className="absolute h-40 w-40"

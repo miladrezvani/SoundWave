@@ -1,4 +1,4 @@
-export const GetAlbums = async ({ pageParam }) => {
+export const GetAlbumsMetaData = async ({ pageParam }) => {
     try {
         const res = await fetch(`/api/get/albums/metadata?page=${pageParam}&limit=9`).then((respones) => { return respones.json() })
         if (!res) {
