@@ -1,0 +1,21 @@
+.marquee {
+    height: 1.25rem;
+    display: inline-flex;
+    gap: 2rem;
+    white-space: nowrap;
+    will-change: transform;
+}
+
+.marquee-item {
+    display: inline-block;
+    padding-right: 0.5rem;
+}
+
+.marquee:hover {
+    animation: marquee 8s linear infinite;
+}
+
+@keyframes marquee {
+    0% {transform: translateX(0);}
+    100% {transform: translateX(-50%);}
+}

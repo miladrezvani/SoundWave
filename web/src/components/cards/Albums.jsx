@@ -13,6 +13,7 @@ import { Input } from "../ui/input";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { GetAlbumsMetaData } from "@/api/GetAlbumsMetaData";
 import { useInView } from "react-intersection-observer";
+import "../../styles/Marquee.css";
 
 const Albums = ({ setAlbum }) => {
   const {
@@ -25,21 +26,31 @@ const Albums = ({ setAlbum }) => {
   } = useInfiniteQuery({
     queryKey: ["ablums"],
     queryFn: ({ pageParam = 1 }) => GetAlbumsMetaData({ pageParam }),
-    getNextPageParam: (LastPage) => LastPage.NextPage,
+    getNextPageParam: (LastPage) => {
+      return LastPage.NextPage != 0 ? LastPage.NextPage : undefined;
+    },
   });
+
   const { ref, inView } = useInView({
-    threshold: 0.5,
+    threshold: 0.1,
     triggerOnce: false,
   });
+
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [inView, hasNextPage, isFetchingNextPage]);
 
   return (
     <Card className="py-2 w-120 overflow-y-auto h-120 gap-0">
-      <Input type="search" placeholder="search" className="mb-2 w-40 mx-auto" />
+      <div className="flex justify-content-center z-99 w-120 absolute">
+        <Input
+          type="search"
+          placeholder="search"
+          className="bg-white w-40 mx-auto"
+        />
+      </div>
       <div className="grid grid-cols-3">
         {data && data.pages
           ? data.pages
@@ -48,16 +59,18 @@ const Albums = ({ setAlbum }) => {
                 <div>
                   <Button
                     variant="ghost"
-                    className="flex flex-box flex-col h-40 w-40 justify-end items-center relative"
+                    className="flex flex-box flex-col h-40 w-40 justify-end items-center relative overflow-x-hidden"
                     key={data.ID}
                     onClick={() => setAlbum(data.ID)}
                   >
                     <img
                       className="absolute h-40 w-40"
-                      src={`http://localhost:8080/get/albums/art?album_id=${data.ID}`}
+                      src={`/api/get/albums/art?album_id=${data.ID}`}
                       alt={data.AlbumName}
                     ></img>
-                    <p className="z-50">{data.AlbumName}</p>
+                    <div className="marquee">
+                      <span className="marquee-item">{data.AlbumName}</span>
+                    </div>
                   </Button>
                 </div>
               ))
