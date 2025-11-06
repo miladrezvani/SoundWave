@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Card,
   CardContent,
@@ -8,15 +8,67 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Button } from "../ui/button";
-import { Progress } from "../ui/progress";
+import { useQuery } from "@tanstack/react-query";
+import { GetMusic } from "@/api/GetMusic";
 
 const Player = () => {
+  const query = useQuery({
+    queryKey: ["songStream"],
+    queryFn: GetMusic,
+  });
+
+  const playerRef = useRef(null);
+
+  const [play, setPlay] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  const togglePlay = () => {
+    if (!playerRef.current) {
+      return;
+    }
+    if (playerRef.current.paused && !play) playerRef.current.play();
+    else {
+      playerRef.current.pause();
+    }
+  };
+
+  const seek = (value) => {
+    if (!playerRef.current) {
+      return;
+    }
+    playerRef.current.currentTime = Math.min(
+      Math.max(0, value),
+      playerRef.current.duration
+    );
+  };
+
+  const format = (time) => {
+    if (!time || isNaN(time)) return "0:00";
+    const minute = Math.floor(time / 60);
+    const second = Math.floor(time % 60)
+      .toString()
+      .padStart(2, "0");
+    return `${minute}:${second}`;
+  };
+
   return (
     <Card
       className="flex flex-box flex-col border py-0 w-64"
       // style={{ background: "linear-gradient(#ffffff, #3d3d3d)" }}
     >
       <img src="/src/assets/react.svg"></img>
+      <audio
+        src={query?.data?.url}
+        ref={playerRef}
+        preload="metadata"
+        onLoadedMetadata={(e) => setDuration(e.target.duration)}
+        onTimeUpdate={(e) =>
+          setCurrentTime(Math.floor(e.target.currentTime || 0))
+        }
+        onPlay={() => setPlay(true)}
+        onPause={() => setPlay(false)}
+      ></audio>
       <CardHeader className="justify-items-center">
         <CardTitle>Music Name</CardTitle>
         <CardDescription>Artist Name</CardDescription>
@@ -26,7 +78,12 @@ const Player = () => {
           <Button size="icon-lg" variant="ghost" className="rounded-full">
             &lt;
           </Button>
-          <Button size="icon-lg" variant="outline" className="rounded-full">
+          <Button
+            size="icon-lg"
+            variant="outline"
+            className="rounded-full"
+            onClick={togglePlay}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -46,10 +103,18 @@ const Player = () => {
             &gt;
           </Button>
         </div>
-        <Progress value={33} className={"mt-5 h-1"} />
+        <input
+          type="range"
+          min={0}
+          max={duration || 0}
+          step={0.01}
+          value={currentTime}
+          onChange={(e) => seek(e.target.value)}
+          className="mt-5 h-1 w-full"
+        />
         <div className="flex justify-between text-sm mt-1">
-          <p>1:02</p>
-          <p>3:52</p>
+          <p>{format(currentTime)}</p>
+          <p>{format(duration)}</p>
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
