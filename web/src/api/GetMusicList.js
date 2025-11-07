@@ -1,6 +1,6 @@
-export const GetMusicList = async ({ album_id }) => {
+export const GetMusicList = async ({ albumId }) => {
     try {
-        const res = await fetch(`/api/get/music/list?album_id=${album_id}`).then((response) => { return response.json() })
+        const res = await fetch(`/api/get/music/list?album_id=${albumId}`).then((response) => { return response.json() })
         if (!res) {
             throw new Error(`Response status: ${res.status}`)
         }

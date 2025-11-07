@@ -8,11 +8,26 @@ const queryClient = new QueryClient();
 
 function App() {
   const [album, setAlbum] = useState();
+  const [playingAlbum, setPlayingAlbum] = useState();
+  const [musicId, setMusicId] = useState();
+  const [title, setTitle] = useState();
+  const [artist, setArtist] = useState();
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex flex-row gap-5 justify-center h-screen items-center">
-        <Player></Player>
-        <PlayerQueue album_id={album}></PlayerQueue>
+        <Player
+          musicId={musicId}
+          title={title}
+          artist={artist}
+          playingAlbum={playingAlbum}
+        ></Player>
+        <PlayerQueue
+          albumId={album}
+          setMusicId={setMusicId}
+          setTitle={setTitle}
+          setArtist={setArtist}
+          setPlayingAlbum={setPlayingAlbum}
+        ></PlayerQueue>
         <Albums setAlbum={setAlbum}></Albums>
       </div>
     </QueryClientProvider>

@@ -11,10 +11,11 @@ import { Button } from "../ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { GetMusic } from "@/api/GetMusic";
 
-const Player = () => {
+const Player = ({ musicId, title, artist, playingAlbum }) => {
   const query = useQuery({
-    queryKey: ["songStream"],
-    queryFn: GetMusic,
+    queryKey: ["songStream", musicId],
+    queryFn: () => GetMusic({ musicId }),
+    enabled: Boolean(musicId),
   });
 
   const playerRef = useRef(null);
@@ -27,8 +28,9 @@ const Player = () => {
     if (!playerRef.current) {
       return;
     }
-    if (playerRef.current.paused && !play) playerRef.current.play();
-    else {
+    if (playerRef.current.paused) {
+      playerRef.current.play();
+    } else {
       playerRef.current.pause();
     }
   };
@@ -57,12 +59,15 @@ const Player = () => {
       className="flex flex-box flex-col border py-0 w-64"
       // style={{ background: "linear-gradient(#ffffff, #3d3d3d)" }}
     >
-      <img src="/src/assets/react.svg"></img>
+      <img src={`/api/get/albums/art?album_id=${playingAlbum}`}></img>
       <audio
         src={query?.data?.url}
         ref={playerRef}
         preload="metadata"
-        onLoadedMetadata={(e) => setDuration(e.target.duration)}
+        onLoadedMetadata={(e) => {
+          setDuration(e.target.duration);
+          playerRef.current.play();
+        }}
         onTimeUpdate={(e) =>
           setCurrentTime(Math.floor(e.target.currentTime || 0))
         }
@@ -70,8 +75,8 @@ const Player = () => {
         onPause={() => setPlay(false)}
       ></audio>
       <CardHeader className="justify-items-center">
-        <CardTitle>Music Name</CardTitle>
-        <CardDescription>Artist Name</CardDescription>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{artist}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-box flex-row justify-center gap-10">
@@ -84,20 +89,37 @@ const Player = () => {
             className="rounded-full"
             onClick={togglePlay}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
-              />
-            </svg>
+            {play ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 5.25v13.5m-7.5-13.5v13.5"
+                />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
+                />
+              </svg>
+            )}
           </Button>
           <Button size="icon-lg" variant="ghost" className="rounded-full">
             &gt;
