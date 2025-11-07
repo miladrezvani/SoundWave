@@ -14,7 +14,6 @@ type musicListjson struct {
 	Title       string
 	TrackNumber string
 	ArtistName  string
-	FilePath    string
 }
 
 func GetMusicList(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +34,6 @@ func GetMusicList(w http.ResponseWriter, r *http.Request) {
 			Title:       music.Title,
 			TrackNumber: music.TrackNumber,
 			ArtistName:  artist.Name,
-			FilePath:    music.FilePath,
 		}
 		musicListData = append(musicListData, data)
 	}
